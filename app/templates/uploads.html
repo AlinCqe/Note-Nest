@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <meta charset="UTF-8">
+    <title>Upload File</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #23272f; /* Dark background */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background: #2c313a; /* Slightly lighter dark */
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 24px 32px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #f7f7f7;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 18px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background: #23272f;
+            color: #f7f7f7;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        a button {
+            margin-top: 16px;
+            background: #28a745;
+        }
+        a button:hover {
+            background: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload a Music Sheet</h1>
+        <form action="/upload_file" method="POST" enctype="multipart/form-data">
+            <label for="file">Select PDF file to upload:</label>
+            <input type="file" name="file" id="file" accept="application/pdf" required>
+
+            <label for="song_name">Song Name:</label>
+            <input type="text" name="song_name" id="song_name" placeholder="e.g. Fur Elise" required>
+
+            <label for="author">Author/Composer:</label>
+            <input type="text" name="author" id="author" placeholder="e.g. Beethoven">
+
+            <label for="category">Category/Genre:</label>
+            <input type="text" name="category" id="category" placeholder="e.g. Classical">
+
+            <label for="instrument">Instrument:</label>
+            <input type="text" name="instrument" id="instrument" placeholder="e.g. Piano">
+
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+
+    <a href="/download/Fur Elise" download>
+        <button>Download "Fur Elise"</button>
+    </a>
+    <a href="/get_sheets">
+        <button>Show All Sheets</button>
+    </a>
+
+</body>
+</html>
