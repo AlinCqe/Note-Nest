@@ -33,9 +33,7 @@ def upload_file():
     insert_sheet(safe_filename=safe_filename, song_name=song_name, author=author, category=category, instrument=instrument)
     
     return jsonify('x')
-#hash_filename,song_name, author, category, instrument)
 
-#donest wrok, returns a html file ....
 @routes.route('/download/<song_name>', methods=['GET'])
 def download(song_name):
     full_path = os.path.join(current_app.root_path, 'static/uploads')
@@ -48,4 +46,12 @@ def download(song_name):
 
 @routes.route('/get_sheets', methods=['GET'])
 def get_sheets():
-    return jsonify(get_sheets_from_dB())
+
+    song_name = request.args.get('song_name', '')
+    author = request.args.get('author', '')
+    category = request.args.get('category', '')
+    instrument = request.args.get('instrument', '')
+
+
+    return get_sheets_from_dB(song_name,author,category,instrument)
+

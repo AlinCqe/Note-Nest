@@ -17,13 +17,40 @@ def create_tables():
             )
         """)    
 
-def get_sheets_from_dB():
+def get_sheets_from_dB(song_name,author,category,instrument):
+
+    filters = []
+    params = []
+    if song_name:
+        filters.append('song_name = ?')
+        params.append(song_name)
+
+    if author:
+        filters.append('author = ?')
+        params.append(author)
+
+    if category:
+        filters.append('category = ?')
+        params.append(category)
+
+    if instrument:
+        filters.append('instrument = ?')
+        params.append(instrument)
+
+    where_clause = ' AND '.join(filters)
+    query = 'SELECT * FROM sheets'
+
+    if where_clause:
+        query += ' WHERE ' + where_clause
+    
+    print(query)
+
 
     with sqlite3.connect('note_nest.db') as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
-        cursor.execute('SELECT * FROM sheets')
+        cursor.execute(query, params)
         rows = cursor.fetchall()        
         data = [dict(row) for row in rows]
         
