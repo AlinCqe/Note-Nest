@@ -32,6 +32,7 @@ SessionLocal = sessionmaker(autocommit=False,autoflush=False, bind=engine)
 
 
 def create_tables():
+    '''
     with sqlite3.connect('note_nest.db') as conn:
         cursor = conn.cursor()
 
@@ -47,34 +48,25 @@ def create_tables():
             )
         """)    
 
-
+    '''
 
 def get_sheets_from_dB(song_name,authors,categories,instruments):
 
     filters = []
-
+    print(song_name,authors,categories,instruments)
     if song_name:
         filters.append(Sheet.song_name == song_name)
 
     if authors:
-        if isinstance(authors, list):
-            filters.append(Sheet.authors.contains(authors))
-        else:    
-            filters.append(authors == any_(Sheet.authors))
+        filters.append(Sheet.authors.contains(authors))
 
     if categories:
-        if isinstance(categories, list):
-            filters.append(Sheet.categories.contains(categories))
-        else:
-            filters.append(instruments == any_(Sheet.categories))
-
+        filters.append(Sheet.categories.contains(categories))
+ 
     if instruments:
-        if isinstance(instruments, list):
-            filters.append(Sheet.instruments.contains(instruments))
-        else:
-            filters.append(instruments == any_(Sheet.instruments))
+        filters.append(Sheet.instruments.contains(instruments))
 
-
+    print(filters)
     with SessionLocal() as session:
         if filters:
             data = session.query(Sheet).filter(and_(*filters)).all()
@@ -93,7 +85,7 @@ def get_sheets_from_dB(song_name,authors,categories,instruments):
     ]
         print(sheets)
         return sheets
-
+    """
     with sqlite3.connect('note_nest.db') as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
@@ -101,20 +93,20 @@ def get_sheets_from_dB(song_name,authors,categories,instruments):
         cursor.execute(query, params)
         rows = cursor.fetchall()        
         data = [dict(row) for row in rows]
-        
+    """    
         
     
 
 def insert_sheet(safe_filename, song_name, authors, categories, instruments):
-
+    """    
     with sqlite3.connect('note_nest.db') as conn:
         cursor = conn.cursor()
 
         cursor.execute("INSERT INTO sheets (safe_filename,song_name, author, category, instrument) VALUES (?,?,?,?,?)", (safe_filename,song_name,  authors, categories, instruments))
         conn.commit()
-
+    """    
     with SessionLocal() as session:
-        session.add(Sheet(safe_filename=safe_filename,song_name=song_name,authors=[authors],categories=[categories],instruments=[instruments]))
+        session.add(Sheet(safe_filename=safe_filename,song_name=song_name,authors=authors,categories=categories,instruments=instruments))
         session.commit()
 
 
@@ -128,8 +120,8 @@ def get_safe_file_name(song_name):
 
 
 
-
-
+    
+    """
     with sqlite3.connect('note_nest.db') as conn:
 
         cursor = conn.cursor()
@@ -137,4 +129,4 @@ def get_safe_file_name(song_name):
         cursor.execute('SELECT safe_filename FROM sheets WHERE song_name = ?', (song_name,))
 
         result  = cursor.fetchone()
-
+    """
