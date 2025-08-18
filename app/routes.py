@@ -10,7 +10,6 @@ routes = Blueprint('routes', __name__)
 def home():
     return render_template('uploads.html')
 
-#use get in case user doenst know on of those params, also in sql make it emptyable
 @routes.route('/upload_file', methods=['POST'])
 def upload_file():
     
@@ -26,10 +25,6 @@ def upload_file():
     instruments = [instrument.strip() for instrument in request.form.get('instruments', '').split(',') if instrument.strip()]
 
     os.makedirs('app/static/uploads',exist_ok=True)
-
-    if os.path.exists(os.path.join('app/static/uploads', file.filename)):
-        return jsonify({'error': 'File already exists'}), 400
-    
     file.save(os.path.join('app/static/uploads', safe_filename))
 
     insert_sheet(safe_filename=safe_filename, song_name=song_name, authors=authors, categories=categories, instruments=instruments)
@@ -48,20 +43,13 @@ def download(song_name):
 @routes.route('/get_sheets', methods=['GET'])
 def get_sheets():
 
-    song_name = request.args.get('song_name', None)
+    song_name = request.args.get('song_name', '')
 
-    authors = request.args.get('authors', None)
-    if authors:
-        authors = authors.split(',')
+    authors = [author.strip() for author in request.args.get('authors', '').split(',') if author.strip()]
 
-    categories = request.args.get('categories', None)
-    if categories:
-        categories = categories.split(',')
+    categories = [category.strip() for category in request.args.get('categories', '').split(',') if category.strip()]
 
-    instruments = request.args.get('instruments', None)
-    if instruments:
-        instruments = instruments.split(',')
+    instruments = [instrument.strip() for instrument in request.args.get('instruments', '').split(',') if instrument.strip()]
 
-
-    return get_sheets_from_dB(song_name,authors,categories,instruments)
+    return jsonify(get_sheets_from_dB(song_name,authors,categories,instruments))
 
