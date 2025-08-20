@@ -1,14 +1,35 @@
-from flask import Blueprint, render_template, request, jsonify, send_from_directory,current_app
+from flask import Blueprint, render_template, request, jsonify, send_from_directory,current_app, redirect, url_for
+from flask_login import UserMixin
 import uuid
 import os
 
-from .dB import insert_sheet, get_safe_file_name, get_sheets_from_dB
-
-routes = Blueprint('routes', __name__)
+from .dB import insert_sheet, get_safe_file_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user
+from .__init__ import loggin_manager
+routes = Blueprint('routes', __name__)  
 
 @routes.route('/', methods=['GET'])
 def home():
     return render_template('uploads.html')
+
+@loggin_manager.user_loader
+def load_user(user_id):
+    if db_load_user(user_id):
+        return db_load_user
+
+@routes.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form=['username']
+        password = request.form=['password']
+
+        if db_check_user_exists(username):
+            return 'User alredy exists', 400
+
+        db_create_user(username, password)
+
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
 
 @routes.route('/upload_file', methods=['POST'])
 def upload_file():

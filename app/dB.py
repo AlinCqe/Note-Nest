@@ -4,7 +4,8 @@ from sqlalchemy import create_engine, Column, Integer, String, DateTime, func, a
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import declarative_base, sessionmaker
 from dotenv import load_dotenv
-
+from flask_bcrypt import Bcrypt
+from flask_login import UserMixin
 import os
 
 load_dotenv()
@@ -12,6 +13,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 engine = create_engine(DATABASE_URL, echo=True)
 
+bcrypt = Bcrypt()
 Base = declarative_base()
 
 class Sheet(Base):
@@ -25,8 +27,42 @@ class Sheet(Base):
     instruments = Column(ARRAY(String))
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=True)
 
+class User(UserMixin, Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(150), unique=True, nullable=False)
+    password_hash = Column(String(128), nullable=False)
+
+    def set_password(self, password):
+        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self.password_hash, password)
+
 SessionLocal = sessionmaker(autocommit=False,autoflush=False, bind=engine)
 
+
+def db_load_user(user_id):
+    with SessionLocal() as session:
+        return session.query(User).get(int(user_id))
+
+def db_check_user_exists(username):
+    with SessionLocal() as session:
+        data = session.query(User).filter_by(User.username==username)
+        if data:
+            return True
+        else:
+            return False
+
+def db_create_user(username, password):
+    
+    user = User(username)
+    user.set_password(password)
+
+    with SessionLocal() as session:
+        session.add(user)
+        session.commit
 
 def create_tables():
     Base.metadata.create_all(bind=engine)
