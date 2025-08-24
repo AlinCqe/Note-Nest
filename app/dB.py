@@ -42,27 +42,50 @@ class User(UserMixin, Base):
 
 SessionLocal = sessionmaker(autocommit=False,autoflush=False, bind=engine)
 
+############# temp func
+def db_get_users():
+    with SessionLocal() as session:
+        data = session.query(User).all()
+        print(data,'============')
+    return 'x'
+
 
 def db_load_user(user_id):
     with SessionLocal() as session:
         return session.query(User).get(int(user_id))
 
 def db_check_user_exists(username):
+
     with SessionLocal() as session:
-        data = session.query(User).filter_by(User.username==username)
+        data = session.query(User).filter_by(username=username).first()
         if data:
+
             return True
         else:
             return False
 
+def db_check_password(username, password):
+    with SessionLocal() as session:
+        user = session.query(User).filter_by(username=username).first()
+
+        if user.check_password(password=password):
+            return True
+        else:
+            return False
+
+def db_get_user(username):
+    with SessionLocal() as session:
+        user = session.query(User).filter_by(username=username).first()
+        return user
+
 def db_create_user(username, password):
     
-    user = User(username)
+    user = User(username=username)
     user.set_password(password)
-
+    print(user.username, user.password_hash,'===============')
     with SessionLocal() as session:
         session.add(user)
-        session.commit
+        session.commit()
 
 def create_tables():
     Base.metadata.create_all(bind=engine)
@@ -70,7 +93,7 @@ def create_tables():
 def get_sheets_from_dB(song_name,authors,categories,instruments):
 
     filters = []
-    print(song_name,authors,categories,instruments)
+
 
     if song_name:
         filters.append(Sheet.song_name.ilike(f"%{song_name}%"))
@@ -84,7 +107,7 @@ def get_sheets_from_dB(song_name,authors,categories,instruments):
     if instruments:
         filters.append(Sheet.instruments.contains(instruments))
 
-    print(filters)
+
     with SessionLocal() as session:
         if filters:
             data = session.query(Sheet).filter(and_(*filters)).all()
@@ -101,7 +124,7 @@ def get_sheets_from_dB(song_name,authors,categories,instruments):
         for sheet in data
 
     ]
-        print(sheets)
+
         return sheets
 
     
@@ -122,4 +145,3 @@ def get_safe_file_name(song_name):
 
 
 
-    

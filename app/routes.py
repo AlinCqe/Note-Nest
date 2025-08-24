@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, jsonify, send_from_directory,current_app, redirect, url_for
-from flask_login import UserMixin
+from flask_login import login_user, current_user, login_required, logout_user
 import uuid
 import os
 
-from .dB import insert_sheet, get_safe_file_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user
+from .dB import insert_sheet, get_safe_file_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_get_users, db_check_password,db_get_user
 from .__init__ import loggin_manager
 routes = Blueprint('routes', __name__)  
 
@@ -13,23 +13,57 @@ def home():
 
 @loggin_manager.user_loader
 def load_user(user_id):
-    if db_load_user(user_id):
-        return db_load_user
+    data = db_load_user(user_id)
+    if data:
+        return data
+
 
 @routes.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form=['username']
-        password = request.form=['password']
+        username = request.form['username']
+
+        password = request.form['password']
 
         if db_check_user_exists(username):
             return 'User alredy exists', 400
 
         db_create_user(username, password)
 
-        return redirect(url_for('login'))
+        return redirect(url_for('routes.login'))
 
     return render_template('register.html')
+
+
+@routes.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if not db_check_user_exists(username) or not db_check_password(username, password):
+            return 'Username or password incorrect', 404
+        user = db_get_user(username)
+
+        login_user(user)
+        return redirect(url_for('routes.home'))
+
+    return render_template('login.html')
+
+
+@routes.route('/logout')
+def logout():
+    logout_user()
+    return 'You are logged out'
+
+@routes.route('/dashboard')
+@login_required
+def dashboard():
+    return f'Hello, {current_user.username}! Logged in: {current_user.is_authenticated}'
+
+
+
+
 
 @routes.route('/upload_file', methods=['POST'])
 def upload_file():
@@ -51,6 +85,8 @@ def upload_file():
     insert_sheet(safe_filename=safe_filename, song_name=song_name, authors=authors, categories=categories, instruments=instruments)
     
     return jsonify('x')
+
+
 
 @routes.route('/download/<song_name>', methods=['GET'])
 def download(song_name):
