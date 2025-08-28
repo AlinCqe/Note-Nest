@@ -1,8 +1,8 @@
 import sqlite3
 
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, func, and_, any_
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, func, and_, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 from flask_login import UserMixin
@@ -27,12 +27,19 @@ class Sheet(Base):
     instruments = Column(ARRAY(String))
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=True)
 
+    user_id = Column(Integer, ForeignKey('users.id'))
+
+    user = relationship('User', back_populates='uploads')
+
 class User(UserMixin, Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(150), unique=True, nullable=False)
     password_hash = Column(String(128), nullable=False)
+
+    uploads = relationship('Sheet', back_populates='user')
+
 
     def set_password(self, password):
         self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -119,7 +126,8 @@ def get_sheets_from_dB(song_name,authors,categories,instruments):
         "song_name": sheet.song_name,
         "authors": sheet.authors,
         "categories": sheet.categories,
-        "instruments": sheet.instruments
+        "instruments": sheet.instruments,   
+        "user_id": sheet.user_id
         }
         for sheet in data
 
@@ -129,10 +137,10 @@ def get_sheets_from_dB(song_name,authors,categories,instruments):
 
     
 
-def insert_sheet(safe_filename, song_name, authors, categories, instruments):
+def insert_sheet(safe_filename, song_name, authors, categories, instruments, user_id):
  
     with SessionLocal() as session:
-        session.add(Sheet(safe_filename=safe_filename,song_name=song_name,authors=authors,categories=categories,instruments=instruments))
+        session.add(Sheet(safe_filename=safe_filename,song_name=song_name,authors=authors,categories=categories,instruments=instruments,user_id=user_id))
         session.commit()
 
 

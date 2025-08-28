@@ -52,6 +52,7 @@ def login():
 
 
 @routes.route('/logout')
+@login_required
 def logout():
     logout_user()
     return 'You are logged out'
@@ -66,6 +67,7 @@ def dashboard():
 
 
 @routes.route('/upload_file', methods=['POST'])
+@login_required
 def upload_file():
     
     file = request.files['file']
@@ -82,7 +84,7 @@ def upload_file():
     os.makedirs('app/static/uploads',exist_ok=True)
     file.save(os.path.join('app/static/uploads', safe_filename))
 
-    insert_sheet(safe_filename=safe_filename, song_name=song_name, authors=authors, categories=categories, instruments=instruments)
+    insert_sheet(safe_filename=safe_filename, song_name=song_name, authors=authors, categories=categories, instruments=instruments,user_id=current_user.id)
     
     return jsonify('x')
 
