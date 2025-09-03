@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form id="filter-form">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3 " id="filter-panel">
+        <h5>Filters</h5>
+
+        <div id="author-filters" class="mb-3">
+            <h6>Authors</h6>
+            <div class="checkboxes">
+
+            </div>
+        </div>
+
+        <div id="instrument-filters" class="mb-3">
+            <h6>Instruments</h6>
+            <div class="checkboxes">
+
+            </div>
+        </div>
+        
+        <div id="category-filters" class="mb-3">
+            <h6>Categories</h6>
+
+            <div class="checkboxes">
+
+            </div>
+        </div>
+   
+    </div>
+    
+    <div class="col-md-9">
+        <div id="sheets-container" class="row">
+
+
+        </div>
+    </div>
+
+  </div>
+
+
+</div>
+</form>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}

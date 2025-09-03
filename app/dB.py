@@ -1,6 +1,6 @@
 import sqlite3
 
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, func, and_, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, func, and_, ForeignKey, or_, exists, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from dotenv import load_dotenv
@@ -11,7 +11,7 @@ import os
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL)
 
 bcrypt = Bcrypt()
 Base = declarative_base()
@@ -97,51 +97,115 @@ def db_create_user(username, password):
 def create_tables():
     Base.metadata.create_all(bind=engine)
 
-def get_sheets_from_dB(song_name,authors,categories,instruments):
-
+def get_sheets_from_dB(song_name=None, authors=None, categories=None, instruments=None, q=None, safe_filename=None):
     filters = []
-
-
+    
     if song_name:
         filters.append(Sheet.song_name.ilike(f"%{song_name}%"))
         
     if authors:
         filters.append(Sheet.authors.contains(authors))
-
+        
     if categories:
         filters.append(Sheet.categories.contains(categories))
  
     if instruments:
         filters.append(Sheet.instruments.contains(instruments))
 
+    if safe_filename:
+        filters.append(Sheet.safe_filename.contains(safe_filename))
+
+
+    if q:
+        q_lower = q.lower()
+        filters.append(
+            or_(
+                Sheet.song_name.ilike(f"%{q}%"),
+                func.lower(func.array_to_string(Sheet.authors, ' ')).ilike(f"%{q_lower}%"),
+                func.lower(func.array_to_string(Sheet.categories, ' ')).ilike(f"%{q_lower}%"),
+                func.lower(func.array_to_string(Sheet.instruments, ' ')).ilike(f"%{q_lower}%")
+            )
+        )
 
     with SessionLocal() as session:
         if filters:
             data = session.query(Sheet).filter(and_(*filters)).all()
+
         else:
-            data =  data = session.query(Sheet).all()
+            data = session.query(Sheet).all()
 
-        sheets = [    {
-        "id": sheet.id,
-        "song_name": sheet.song_name,
-        "authors": sheet.authors,
-        "categories": sheet.categories,
-        "instruments": sheet.instruments,   
-        "user_id": sheet.user_id
+        sheets = [    
+            {
+                "id": sheet.id,
+                "song_name": sheet.song_name,
+                "authors": sheet.authors,
+                "categories": sheet.categories,
+                "instruments": sheet.instruments,   
+                "user_id": sheet.user_id,
+                "safe_filename": sheet.safe_filename
+            }
+            for sheet in data
+        ]
+
+        authors_check_box = []
+        instruments_check_box = []
+        categories_check_box = []
+
+        for sheet in data:
+            for a in sheet.authors:
+                authors_check_box.append(a)
+
+            for i in sheet.instruments:
+                instruments_check_box.append(i)
+
+            for c in sheet.categories:
+                categories_check_box.append(c)
+
+        authors_check_box = list(set(authors_check_box))
+        instruments_check_box = list(set(instruments_check_box))
+        categories_check_box = list(set(categories_check_box))
+
+        filters = {
+            'authors': authors_check_box,
+            'instruments': instruments_check_box,
+            'categories':categories_check_box
         }
-        for sheet in data
+        print(filters)
+        return {'sheets': sheets, 'filters': filters}
 
-    ]
 
-        return sheets
-
-    
 
 def insert_sheet(safe_filename, song_name, authors, categories, instruments, user_id):
  
     with SessionLocal() as session:
         session.add(Sheet(safe_filename=safe_filename,song_name=song_name,authors=authors,categories=categories,instruments=instruments,user_id=user_id))
         session.commit()
+
+
+def get_filters_from_db():
+
+    authors = []
+    instruments = []
+    categories = []
+
+    with SessionLocal() as session:
+        for sheet in session.query(Sheet).all():
+            for a in sheet.authors:
+                authors.append(a)
+
+            for i in sheet.instruments:
+                instruments.append(a)
+
+            for c in sheet.categories:
+                categories.append(a)
+
+    authors = list(set(authors))
+    instruments = list(set(instruments))
+    categories = list(set(categories))
+
+    print(authors, instruments, categories)
+
+    return authors, instruments, categories
 
 
 
