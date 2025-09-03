@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid" id="sheet-page" data-sheet="{{  safe_filename  }}">
+    <div class="row">
+
+        <div class="col-md-8" id="pdf-container">
+            <h1>asdasdsa</h1>
+        </div>
+
+        <div class="col-md-4" id="sheet-data-container">
+            <h1></h1>
+        </div>
+
+
+    </div>
+</div>
+<script src="{{ url_for('static', filename='sheet.js') }}"></script>
+
+{% endblock %}

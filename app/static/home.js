@@ -80,7 +80,6 @@
                 col.classList.add('col-sm-6', 'col-md-4', 'mb-4');
 
                 const link = document.createElement('a');
-                console.log(sheet.safe_filename )
                 link.href = `/sheet/${sheet.safe_filename}`;
                 link.style.textDecoration = 'none';
 

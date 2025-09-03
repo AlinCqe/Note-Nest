@@ -116,10 +116,15 @@ def get_sheets():
 
 @routes.route('/sheet/<safe_filename>', methods=['GET'])
 def sheet(safe_filename):
+    return render_template('sheet.html', safe_filename=safe_filename)
 
+@routes.route('api/sheet/<safe_filename>', methods=['GET'])
+def api_sheet(safe_filename):
+    print(safe_filename)
     sheet = get_sheets_from_dB(safe_filename=safe_filename)
     print(sheet)
     if sheet:
         return jsonify(sheet)
     else:
         return jsonify({'error': 'Sheet not found'}), 404
+    
