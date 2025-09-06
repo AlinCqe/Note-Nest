@@ -3,13 +3,13 @@ from flask_login import login_user, current_user, login_required, logout_user
 import uuid
 import os
 
-from .dB import insert_sheet, get_safe_file_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_get_users, db_check_password,db_get_user
+from .dB import insert_sheet, get_safe_file_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_get_users, db_check_password,db_get_user, get_user_data
 from .__init__ import loggin_manager
 routes = Blueprint('routes', __name__)  
 
 @routes.route('/', methods=['GET'])
 def home():
-    return render_template('home.html')
+    return render_template('home.html', show_search=True)
 
 @loggin_manager.user_loader
 def load_user(user_id):
@@ -32,7 +32,7 @@ def register():
 
         return redirect(url_for('routes.login'))
 
-    return render_template('register.html')
+    return render_template('register.html', show_search=False)
 
 
 @routes.route('/login', methods=['GET', 'POST'])
@@ -46,9 +46,9 @@ def login():
         user = db_get_user(username)
 
         login_user(user)
-        return redirect(url_for('routes.home'))
+        return redirect(url_for('routes.home', show_search=True))
 
-    return render_template('login.html')
+    return render_template('login.html', show_search=False)
 
 
 @routes.route('/logout')
@@ -87,7 +87,7 @@ def upload_file():
         insert_sheet(safe_filename=safe_filename, song_name=song_name, authors=authors, categories=categories, instruments=instruments,user_id=current_user.id)
         
         return jsonify('x')
-    return render_template('uploads.html')
+    return render_template('uploads.html', show_search=True)
 
 
 @routes.route('/download/<song_name>', methods=['GET'])
@@ -116,7 +116,7 @@ def get_sheets():
 
 @routes.route('/sheet/<safe_filename>', methods=['GET'])
 def sheet(safe_filename):
-    return render_template('sheet.html', safe_filename=safe_filename)
+    return render_template('sheet.html', safe_filename=safe_filename, show_search=True)
 
 @routes.route('api/sheet/<safe_filename>', methods=['GET'])
 def api_sheet(safe_filename):
@@ -128,3 +128,14 @@ def api_sheet(safe_filename):
     else:
         return jsonify({'error': 'Sheet not found'}), 404
     
+@routes.route('/api/user/<user_id>', methods=['GET'])
+def user_sheets(user_id):
+
+
+    sheets, user_data = get_user_data(user_id)
+    return jsonify({'sheets': sheets, 'user_data':user_data})
+
+@routes.route('/user/<user_id>')
+def user(user_id):
+    print(user_id)
+    return render_template('user.html',user_id=user_id, show_search=True)

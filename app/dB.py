@@ -38,6 +38,8 @@ class User(UserMixin, Base):
     username = Column(String(150), unique=True, nullable=False)
     password_hash = Column(String(128), nullable=False)
 
+    profile_picture_safe_filename = Column(String, nullable=False)
+
     uploads = relationship('Sheet', back_populates='user')
 
 
@@ -89,7 +91,7 @@ def db_create_user(username, password):
     
     user = User(username=username)
     user.set_password(password)
-    print(user.username, user.password_hash,'===============')
+
     with SessionLocal() as session:
         session.add(user)
         session.commit()
@@ -97,7 +99,7 @@ def db_create_user(username, password):
 def create_tables():
     Base.metadata.create_all(bind=engine)
 
-def get_sheets_from_dB(song_name=None, authors=None, categories=None, instruments=None, q=None, safe_filename=None):
+def get_sheets_from_dB(song_name=None, authors=None, categories=None, instruments=None, q=None, safe_filename=None, user_id=None):
     filters = []
     
     if song_name:
@@ -114,6 +116,9 @@ def get_sheets_from_dB(song_name=None, authors=None, categories=None, instrument
 
     if safe_filename:
         filters.append(Sheet.safe_filename.contains(safe_filename))
+
+    if user_id:
+        filters.append(Sheet.user_id.contains(user_id))
 
 
     if q:
@@ -216,4 +221,28 @@ def get_safe_file_name(song_name):
         return safe_filename
 
 
+def get_user_data(user_id):
 
+    with SessionLocal() as session:
+        sheets_data = session.query(Sheet).filter(Sheet.user_id == user_id).all()
+        sheets = [    
+            {
+                "id": sheet.id,
+                "song_name": sheet.song_name,
+                "authors": sheet.authors,
+                "categories": sheet.categories,
+                "instruments": sheet.instruments,   
+                "user_id": sheet.user_id,
+                "safe_filename": sheet.safe_filename
+            }
+            for sheet in sheets_data
+        ]
+
+        profile_query = session.query(User).filter(User.id == user_id).with_entities(User.username, User.profile_picture_safe_filename).all()
+        profile_data = [
+            {"username": username, "profile_picture": profile_picture}
+            for username, profile_picture in profile_query
+        ]
+
+    print(sheets, profile_data)
+    return sheets, profile_data
