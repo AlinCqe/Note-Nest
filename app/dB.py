@@ -1,5 +1,3 @@
-import sqlite3
-
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, func, and_, ForeignKey, or_, exists, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship, joinedload
@@ -55,7 +53,6 @@ SessionLocal = sessionmaker(autocommit=False,autoflush=False, bind=engine)
 def db_get_users():
     with SessionLocal() as session:
         data = session.query(User).all()
-        print(data,'============')
     return 'x'
 
 
@@ -89,7 +86,7 @@ def db_get_user(username):
 
 def db_create_user(username, password):
     
-    user = User(username=username)
+    user = User(username=username, profile_picture_safe_filename='default_pf.jpg')
     user.set_password(password)
 
     with SessionLocal() as session:

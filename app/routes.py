@@ -29,7 +29,7 @@ def register():
 
         if db_check_user_exists(username):
             return 'User alredy exists', 400
-
+        
         db_create_user(username, password)
 
         return redirect(url_for('routes.login'))
