@@ -30,11 +30,11 @@
         </li>
       </ul>
 
-      <!-- Search form goes outside the <ul> -->
+
       {% if show_search %}
-      <form id="search-form" class="d-flex" role="search" >
-        <input class="form-control me-2" type="search" placeholder="Search" name="q" aria-label="Search">
-        <button class="btn btn-outline-light" type="submit">Search</button>
+      <form id="search-form" action="/" method="GET">
+        <input type="text" name="q" placeholder="Search..." value="{{ q }}">
+        <button type="submit">Search</button>
       </form>
       {% endif %}
     </div>

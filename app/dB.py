@@ -2,7 +2,7 @@ import sqlite3
 
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, func, and_, ForeignKey, or_, exists, select
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship, joinedload
 from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 from flask_login import UserMixin
@@ -134,10 +134,10 @@ def get_sheets_from_dB(song_name=None, authors=None, categories=None, instrument
 
     with SessionLocal() as session:
         if filters:
-            data = session.query(Sheet).filter(and_(*filters)).all()
+            data = session.query(Sheet).options(joinedload(Sheet.user)).filter(and_(*filters)).all()
 
         else:
-            data = session.query(Sheet).all()
+            data = session.query(Sheet).options(joinedload(Sheet.user)).all()
 
         sheets = [    
             {
@@ -147,7 +147,9 @@ def get_sheets_from_dB(song_name=None, authors=None, categories=None, instrument
                 "categories": sheet.categories,
                 "instruments": sheet.instruments,   
                 "user_id": sheet.user_id,
-                "safe_filename": sheet.safe_filename
+                "safe_filename": sheet.safe_filename,
+                "userame": sheet.user.username,
+                "profile_picture": sheet.user.profile_picture_safe_filename
             }
             for sheet in data
         ]
@@ -175,7 +177,7 @@ def get_sheets_from_dB(song_name=None, authors=None, categories=None, instrument
             'instruments': instruments_check_box,
             'categories':categories_check_box
         }
-        print(filters)
+
         return {'sheets': sheets, 'filters': filters}
 
 
@@ -244,5 +246,5 @@ def get_user_data(user_id):
             for username, profile_picture in profile_query
         ]
 
-    print(sheets, profile_data)
+
     return sheets, profile_data

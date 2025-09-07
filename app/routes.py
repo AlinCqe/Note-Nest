@@ -9,7 +9,9 @@ routes = Blueprint('routes', __name__)
 
 @routes.route('/', methods=['GET'])
 def home():
-    return render_template('home.html', show_search=True)
+    q = request.args.get('q', '')
+    # Perform your query and pass `q` to the template.
+    return render_template('home.html', show_search=True, q=q, sheets=get_sheets_from_dB(q=q))
 
 @loggin_manager.user_loader
 def load_user(user_id):

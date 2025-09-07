@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function(e){
     function renderUserData(data){
         user_container.innerHTML = ''
             
-        const photo = document.createElement('img');   // use img tag
+        const photo = document.createElement('img');   
         photo.src = `/static/profile_pictures/${data.profile_picture}`;
 
         photo.alt = 'Profile Picture';
