@@ -1,15 +1,16 @@
-document.addEventListener("DOMContentLoaded", function(e){
+document.addEventListener("DOMContentLoaded", function() {
 
     const user_container = document.getElementById("user-container");
     const sheets_container = document.getElementById("sheets-container");
 
-
     const user_id = user_container.dataset.userId;
-    console.log(user_id);
 
     user_container.innerHTML = '';
     sheets_container.innerHTML = '';
 
+    // -------------------
+    // Render sheets cards
+    // -------------------
     function renderSheets(data) {
         sheets_container.innerHTML = ''; 
         data.forEach(sheet => {
@@ -56,28 +57,81 @@ document.addEventListener("DOMContentLoaded", function(e){
         });
     }
 
+    // -------------------
+    // Render user data
+    // -------------------
     function renderUserData(data){
-        user_container.innerHTML = ''
+        user_container.innerHTML = '';
             
         const photo = document.createElement('img');   
         photo.src = `/static/profile_pictures/${data.profile_picture}`;
-
         photo.alt = 'Profile Picture';
+        photo.style.cursor = "pointer";
 
-        user_container.appendChild(photo)
+        // If modal exists, make photo trigger it
+        const modal = document.getElementById('profilePicModal');
+        if (modal) {
+            photo.setAttribute("data-bs-toggle", "modal");
+            photo.setAttribute("data-bs-target", "#profilePicModal");
+        }
+
+        user_container.appendChild(photo);
 
         const username = document.createElement('h1');
-        username.textContent = data.username
-
-        user_container.appendChild(username)
+        username.textContent = data.username;
+        user_container.appendChild(username);
     }
 
+    // -------------------
+    // Fetch user + sheets data
+    // -------------------
     fetch(`/api/user/${user_id}`)
         .then(res => res.json())
         .then(data => {
-            renderSheets(data.sheets)
-            renderUserData(data.user_data[0])
+            renderSheets(data.sheets);
+            renderUserData(data.user_data[0]);
         })
+        .catch(err => console.error("Error fetching user data:", err));
 
+    // -------------------
+    // Handle profile picture upload
+    // -------------------
+    const change_photo_submit_button = document.getElementById('change_photo_submit_button');
+    if (change_photo_submit_button) {
+        change_photo_submit_button.addEventListener("click", function(e){
+            e.preventDefault();
 
-})
+            const form = document.getElementById("profile-pic-form");
+            const fileInput = form.querySelector('input[name="photo"]');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a file");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('photo', file);
+
+            fetch(`/api/user/change_photo`, {
+                method: 'PATCH', 
+                body: formData
+            })
+            .then(res => res.json().then(data => ({status: res.status, ok: res.ok, body: data})))
+            .then(result => {
+                if (result.ok) {
+                    const photo = user_container.querySelector("img");
+                    photo.src = `/static/profile_pictures/${result.body.new_filename}?t=${Date.now()}`;
+
+                } else {
+                    alert(result.body.error || "Upload failed");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Upload failed");
+            });
+        });
+    }
+
+});

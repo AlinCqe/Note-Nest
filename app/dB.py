@@ -145,7 +145,7 @@ def get_sheets_from_dB(song_name=None, authors=None, categories=None, instrument
                 "instruments": sheet.instruments,   
                 "user_id": sheet.user_id,
                 "safe_filename": sheet.safe_filename,
-                "userame": sheet.user.username,
+                "username": sheet.user.username,
                 "profile_picture": sheet.user.profile_picture_safe_filename
             }
             for sheet in data
@@ -245,3 +245,13 @@ def get_user_data(user_id):
 
 
     return sheets, profile_data
+
+def db_update_profile_picture(user_id, new_safe_filename):
+    with SessionLocal() as session:
+        user = session.query(User).filter(User.id    == user_id).first()
+
+        if user:
+            user.profile_picture_safe_filename = new_safe_filename
+            session.commit() 
+    
+

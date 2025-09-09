@@ -20,6 +20,27 @@
 
 
 </div>
+{% if can_edit %}
+<div class="modal fade" id="profilePicModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Change Profile Picture</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="profile-pic-form" enctype="multipart/form-data">
+          <input type="file" name="photo" accept="image/*" class="form-control mb-3" >
+          <button type="submit" class="btn btn-primary" id="change_photo_submit_button">Upload</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <script src="{{ url_for('static', filename='user.js') }}"></script>
 
 {% endblock %}

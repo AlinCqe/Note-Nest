@@ -40,5 +40,20 @@ document.addEventListener('DOMContentLoaded', function(e){
             categories.textContent = `Categories: ${sheet.categories.join(' ,')}`
             sheet_data_container.appendChild(categories)
 
+            user_container = document.createElement('div')
+            user_container.innerHTML = '';
+                
+            const photo = document.createElement('img');   
+            photo.src = `/static/profile_pictures/${sheet.profile_picture}`;
+            photo.alt = 'Profile Picture';
+            photo.style.cursor = "pointer"; // make it look clickable
+
+            user_container.appendChild(photo);
+
+            const username = document.createElement('h1');
+            username.textContent = sheet.username;
+            user_container.appendChild(username);
+        
+            sheet_data_container.appendChild(user_container)
         })
 })
