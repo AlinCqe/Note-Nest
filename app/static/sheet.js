@@ -40,6 +40,18 @@ document.addEventListener('DOMContentLoaded', function(e){
             categories.textContent = `Categories: ${sheet.categories.join(' ,')}`
             sheet_data_container.appendChild(categories)
 
+
+            const downloadBtn = document.createElement('button');
+            downloadBtn.textContent = "Download PDF";
+            downloadBtn.classList.add('btn', 'btn-primary');
+
+            downloadBtn.addEventListener('click', () => {
+                window.location.href = `/api/download/${sheet.safe_filename}`;
+            });
+            
+            sheet_data_container.appendChild(downloadBtn);
+
+
             user_container = document.createElement('div')
             user_container.innerHTML = '';
                 

@@ -133,8 +133,8 @@ document.addEventListener('DOMContentLoaded', function() {
       userDiv.appendChild(photo);
 
       const username = document.createElement('p');
-      username.textContent = sheet.userame;
-      username.classList.add('col-md-3');
+      username.textContent = sheet.username;
+      username.classList.add('col-md-9');
       userDiv.appendChild(username);
 
       body.appendChild(userDiv);

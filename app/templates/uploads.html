@@ -5,63 +5,7 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>   
     <meta charset="UTF-8">
     <title>Upload File</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #23272f; 
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            background: #2c313a; 
-            max-width: 400px;
-            margin: 40px auto;
-            padding: 24px 32px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 24px;
-            color: #f7f7f7;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-            color: #e0e0e0;
-        }
-        input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 18px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            box-sizing: border-box;
-            background: #23272f;
-            color: #f7f7f7;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        a button {
-            margin-top: 16px;
-            background: #28a745;
-        }
-        a button:hover {
-            background: #1e7e34;
-        }
-    </style>
+
 </head>
 <body>
     <div class="container">
@@ -92,32 +36,6 @@
     <a href="/get_sheets">
         <button>Show All Sheets</button>
     </a>
-
-
-    <form action="/get_sheets" method="GET" style="margin: 32px auto; max-width: 400px;">
-        
-        <label for="song_name" style="color:#e0e0e0;">Song Name:</label>
-        <input type="text" id="song_name" name="song_name" placeholder="e.g. Fur Elise">
-
-        <label for="authors" style="color:#e0e0e0;">Author/Composer:</label>
-        <input type="text" id="authors" name="authors" placeholder="e.g. Beethoven">
-
-        <label for="categories" style="color:#e0e0e0;">Category/Genre:</label>
-        <input type="text" id="categories" name="categories" placeholder="e.g. Classical">
-
-        <label for="instruments" style="color:#e0e0e0;">Instrument:</label>
-        <input type="text" id="instruments" name="instruments" placeholder="e.g. Piano">
-
-        <button type="submit">Search</button>
-    </form>
-
-
-    <form action="get_users" method="GET">
-
-
-
-        <button type="submit">asdsadsad</button>
-    </form>
 
 </body>
 </html>

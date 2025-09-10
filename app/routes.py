@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, login_required, logout_user
 import uuid
 import os
 
-from .dB import insert_sheet, get_safe_file_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_get_users, db_check_password,db_get_user, get_user_data, db_update_profile_picture
+from .dB import insert_sheet, get_song_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_get_users, db_check_password,db_get_user, get_user_data, db_update_profile_picture
 from .__init__ import loggin_manager
 routes = Blueprint('routes', __name__)  
 
@@ -57,7 +57,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return 'You are logged out'
+    return redirect(url_for('routes.home'))
 
 @routes.route('/dashboard')
 @login_required
@@ -95,13 +95,14 @@ def upload_file():
     return render_template('uploads.html', show_search=True)
 
 
-@routes.route('/download/<song_name>', methods=['GET'])
-def download(song_name):
+
+@routes.route('/api/download/<filename>', methods=['GET'])
+def download(filename):
     full_path = os.path.join(current_app.root_path, 'static/uploads')
+    song_name = get_song_name(filename=filename)
 
-    safe_filename = get_safe_file_name(song_name)
+    return send_from_directory(directory=full_path, path=filename, as_attachment=True, download_name=f'{song_name}.pdf')
 
-    return send_from_directory(directory=full_path, path=safe_filename, as_attachment=True, download_name=song_name)
 
 
 @routes.route('/get_sheets', methods=['GET'])
@@ -119,9 +120,13 @@ def get_sheets():
 
     return jsonify(get_sheets_from_dB(song_name,authors,categories,instruments,q))
 
+
+
 @routes.route('/sheet/<safe_filename>', methods=['GET'])
 def sheet(safe_filename):
     return render_template('sheet.html', safe_filename=safe_filename, show_search=True)
+
+
 
 @routes.route('api/sheet/<safe_filename>', methods=['GET'])
 def api_sheet(safe_filename):
@@ -133,6 +138,8 @@ def api_sheet(safe_filename):
     else:
         return jsonify({'error': 'Sheet not found'}), 404
     
+
+
 @routes.route('/api/user/<user_id>', methods=['GET'])
 def user_sheets(user_id):
 
@@ -140,12 +147,16 @@ def user_sheets(user_id):
     sheets, user_data = get_user_data(user_id)
     return jsonify({'sheets': sheets, 'user_data':user_data})
 
+
+
 @routes.route('/user/<user_id>', methods=['GET'])
 def user(user_id):
 
     can_edit = (current_user.id == int(user_id))
 
     return render_template('user.html',user_id=user_id, show_search=True, can_edit=can_edit)
+
+
 
 @routes.route('/api/user/change_photo', methods=['PATCH'])
 def change_photo():

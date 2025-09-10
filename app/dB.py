@@ -213,11 +213,12 @@ def get_filters_from_db():
 
 
 
-def get_safe_file_name(song_name):
+def get_song_name(filename):
 
     with SessionLocal() as session:
-        safe_filename = session.query(Sheet.safe_filename).filter(Sheet.song_name == song_name).scalar()
-        return safe_filename
+        song_name = session.query(Sheet.song_name).filter(Sheet.safe_filename == filename).scalar()
+        print(song_name)
+        return song_name
 
 
 def get_user_data(user_id):
