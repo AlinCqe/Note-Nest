@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Note Nest</title>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+      <style>
+.profile-pic {
+    width: 40px;   /* or whatever size you like */
+    height: 40px;  /* keeps it square */
+    object-fit: cover;  /* crops image nicely if it’s not square */
+    border-radius: 50%; /* optional: makes it circular */
+}
+</style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -16,20 +24,51 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
+
+        {% if not current_user.is_authenticated %}
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="{{ url_for('routes.register') }}">Register</a>
         </li>
+
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('routes.login') }}">Log In</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Pricing</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-        </li>
-      </ul>
+        {% endif %}
 
+        {% if current_user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('routes.logout') }}">Log Out</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('routes.upload_file') }}">Upload Sheet</a>
+        </li>
+
+
+        {% endif %}
+
+        <li class="nav-item">
+        {% if current_user.is_authenticated %}
+        <div class="row">
+          <a class="nav-link col-md-4" href="{{ url_for('routes.user', user_id=current_user.id) }}">
+            <img src="{{ url_for('static', filename='profile_pictures/' ~ current_user.profile_picture_safe_filename) }}" alt="Profile picture" class="profile-pic">
+          </a>
+
+        </div>
+
+        {% endif %}
+
+          {% if not current_user.is_authenticated %}
+          <div class="row">
+          <a class="nav-link col-md-4" href="{{ url_for('routes.login') }}">
+            <img src="{{ url_for('static', filename='profile_pictures/default_pf.jpg') }}" alt="Profile picture" class="profile-pic">
+          </a>
+              <h2 class="col-md-8">Guest</h2>
+          </div>
+          {% endif %}
+        </li>
+
+      </ul>
 
       {% if show_search %}
       <form id="search-form" action="/" method="GET">
