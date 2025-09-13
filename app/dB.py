@@ -249,10 +249,34 @@ def get_user_data(user_id):
 
 def db_update_profile_picture(user_id, new_safe_filename):
     with SessionLocal() as session:
-        user = session.query(User).filter(User.id    == user_id).first()
+        user = session.query(User).filter(User.id == user_id).first()
 
         if user:
             user.profile_picture_safe_filename = new_safe_filename
             session.commit() 
     
 
+def db_edit_sheet(safe_filename,song_name=None, authors=None, categories=None, instruments=None):
+    
+    print(safe_filename,song_name,authors,categories,instruments)
+    with SessionLocal() as session:
+        
+        sheet = session.query(Sheet).filter(Sheet.safe_filename == safe_filename).first()
+        print(sheet)
+        if sheet:
+            if song_name:
+                sheet.song_name = song_name 
+
+            if authors:
+                sheet.authors = authors 
+
+            if categories:
+                sheet.categories = categories 
+
+            if instruments:
+                sheet.instruments = instruments 
+        else:
+            print(sheet)
+        session.commit()
+
+        

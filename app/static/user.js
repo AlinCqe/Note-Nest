@@ -50,10 +50,32 @@ document.addEventListener("DOMContentLoaded", function() {
             instruments.textContent = sheet.instruments;
             body.appendChild(instruments);
 
+            const editBtn = document.createElement('button');
+            editBtn.classList.add('btn', 'btn-sm', 'btn-primary');
+            editBtn.textContent = 'Edit';
+            editBtn.setAttribute('data-bs-toggle', 'modal');
+            editBtn.setAttribute('data-bs-target', '#editSheetModal');
+
+            editBtn.addEventListener('click', function(event) {
+                    event.stopPropagation(); // <-- prevent the link click
+                    event.preventDefault(); // <-- optional, prevents default behavior
+
+                document.getElementById('editSafeFilename').value = sheet.safe_filename;
+                document.getElementById('editSongName').value = sheet.song_name;
+                document.getElementById('editAuthors').value = sheet.authors.join(', ');
+                document.getElementById('editCategories').value = sheet.categories.join(', ');
+                document.getElementById('editInstruments').value = sheet.instruments.join(', ');
+            });
+
+            body.appendChild(editBtn);
+
             card.appendChild(body);
             link.appendChild(card);
             col.appendChild(link);
             sheets_container.appendChild(col);
+
+
+
         });
     }
 
@@ -133,5 +155,32 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     }
+    document.getElementById('editSheetForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch('/api/edit_sheet', {
+            method: 'PATCH',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Sheet updated!');
+                // Optionally, refresh your sheets list here
+            } else {
+                alert('Error: ' + data.message);
+            }
+
+            // Close the modal
+            const modalEl = document.getElementById('editSheetModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+        })
+        .catch(error => {
+            alert('Error: ' + error);
+        });
+    });
 
 });

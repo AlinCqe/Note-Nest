@@ -3,8 +3,9 @@ from flask_login import login_user, current_user, login_required, logout_user
 import uuid
 import os
 
-from .dB import insert_sheet, get_song_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_get_users, db_check_password,db_get_user, get_user_data, db_update_profile_picture
+from .dB import insert_sheet, get_song_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_edit_sheet, db_check_password,db_get_user, get_user_data, db_update_profile_picture
 from .__init__ import loggin_manager
+
 routes = Blueprint('routes', __name__)  
 
 @routes.route('/', methods=['GET'])
@@ -98,6 +99,8 @@ def upload_file():
         return jsonify(success=False, message=str(e)), 400
 
 
+
+
 @routes.route('/api/download/<filename>', methods=['GET'])
 def download(filename):
     full_path = os.path.join(current_app.root_path, 'static/uploads')
@@ -174,3 +177,26 @@ def change_photo():
     db_update_profile_picture(user_id = current_user.id, new_safe_filename = new_safe_filename)
 
     return jsonify({"new_filename": file.filename}), 200
+
+
+@routes.route('/api/edit_sheet', methods=['PATCH'])
+def edit_sheet():
+    try:
+
+        safe_filename = request.form.get('safe_filename', '')
+        song_name = request.form.get('song_name', '')
+
+        authors = [author.strip() for author in request.form.get('authors', '').split(',') if author.strip()]
+
+        categories = [category.strip() for category in request.form.get('categories', '').split(',') if category.strip()]
+
+        instruments = [instrument.strip() for instrument in request.form.get('instruments', '').split(',') if instrument.strip()]
+
+        db_edit_sheet(safe_filename=safe_filename, song_name=song_name, authors=authors, categories=categories, instruments=instruments)
+        
+
+        return jsonify(success=True, message="File edited successfully!")
+
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 400
+

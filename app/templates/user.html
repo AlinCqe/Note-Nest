@@ -18,8 +18,8 @@
 
     </div>
 
-
 </div>
+
 {% if can_edit %}
 <div class="modal fade" id="profilePicModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
@@ -39,7 +39,52 @@
     </div>
   </div>
 </div>
+
+<!-- Edit Sheet Modal -->
+<div class="modal fade" id="editSheetModal" tabindex="-1" aria-labelledby="editSheetModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editSheetForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editSheetModalLabel">Edit Sheet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          
+          <input type="hidden" name="safe_filename" id="editSafeFilename">
+
+          <div class="mb-3">
+            <label for="editSongName" class="form-label">Song Name</label>
+            <input type="text" class="form-control" id="editSongName" name="song_name" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="editAuthors" class="form-label">Authors (comma separated)</label>
+            <input type="text" class="form-control" id="editAuthors" name="authors">
+          </div>
+
+          <div class="mb-3">
+            <label for="editCategories" class="form-label">Categories (comma separated)</label>
+            <input type="text" class="form-control" id="editCategories" name="categories">
+          </div>
+
+          <div class="mb-3">
+            <label for="editInstruments" class="form-label">Instruments (comma separated)</label>
+            <input type="text" class="form-control" id="editInstruments" name="instruments">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 {% endif %}
+
+
 
 <script src="{{ url_for('static', filename='user.js') }}"></script>
 
