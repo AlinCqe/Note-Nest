@@ -71,10 +71,10 @@ def check_logged_user(user_id):
     if user_id == current_user.user_id:
         return True
 
-@routes.route('/upload_file', methods=['GET','POST'])
+@routes.route('/upload_file', methods=['POST'])
 @login_required
 def upload_file():
-    if request.method == 'POST':
+    try:
         file = request.files['file']
         ext = os.path.splitext(file.filename)[1] 
         safe_filename = f"{uuid.uuid4()}{ext}"
@@ -91,9 +91,11 @@ def upload_file():
 
         insert_sheet(safe_filename=safe_filename, song_name=song_name, authors=authors, categories=categories, instruments=instruments,user_id=current_user.id)
         
-        return jsonify('x')
-    return render_template('uploads.html', show_search=True)
 
+        return jsonify(success=True, message="File uploaded successfully!")
+
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 400
 
 
 @routes.route('/api/download/<filename>', methods=['GET'])
