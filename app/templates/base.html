@@ -48,12 +48,13 @@
         {% endif %}
 
         <li class="nav-item">
+
         {% if current_user.is_authenticated %}
         <div class="row">
           <a class="nav-link col-md-4" href="{{ url_for('routes.user', user_id=current_user.id) }}">
             <img src="{{ url_for('static', filename='profile_pictures/' ~ current_user.profile_picture_safe_filename) }}" alt="Profile picture" class="profile-pic">
           </a>
-
+            <h2 class="col-md-8">{{ current_user.username}}</h2>
         </div>
 
         {% endif %}
