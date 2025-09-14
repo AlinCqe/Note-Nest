@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, login_required, logout_user
 import uuid
 import os
 
-from .dB import insert_sheet, get_song_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_edit_sheet, db_check_password,db_get_user, get_user_data, db_update_profile_picture
+from .dB import insert_sheet, get_song_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_edit_sheet, db_check_password,db_get_user, get_user_data, db_update_profile_picture,db_delete_sheet
 from .__init__ import loggin_manager
 
 routes = Blueprint('routes', __name__)  
@@ -200,3 +200,13 @@ def edit_sheet():
     except Exception as e:
         return jsonify(success=False, message=str(e)), 400
 
+@routes.route('/api/delete_sheet', methods=['DELETE'])
+def delete_sheet():
+    safe_filename = request.json.get("safe_filename", "")
+    if os.path.exists(os.path.join(current_app.root_path, 'static', 'uploads', safe_filename)):
+        
+        if db_delete_sheet(safe_filename):
+            os.remove(os.path.join(current_app.root_path, 'static', 'uploads', safe_filename))
+            return jsonify(success=True, message="File deleted succesfully!")
+        else:
+            return jsonify(success=False, message="Something went wrong, please try again later")

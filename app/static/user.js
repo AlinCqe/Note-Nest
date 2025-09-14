@@ -57,8 +57,8 @@ document.addEventListener("DOMContentLoaded", function() {
             editBtn.setAttribute('data-bs-target', '#editSheetModal');
 
             editBtn.addEventListener('click', function(event) {
-                    event.stopPropagation(); // <-- prevent the link click
-                    event.preventDefault(); // <-- optional, prevents default behavior
+                    event.stopPropagation(); 
+                    event.preventDefault(); 
 
                 document.getElementById('editSafeFilename').value = sheet.safe_filename;
                 document.getElementById('editSongName').value = sheet.song_name;
@@ -68,6 +68,24 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             body.appendChild(editBtn);
+
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('btn', 'btn-danger')
+            deleteBtn.textContent = 'Delete'
+
+            deleteBtn.setAttribute('data-bs-toggle', 'modal');
+            deleteBtn.setAttribute('data-bs-target', '#deleteModal');
+            deleteBtn.setAttribute('data-song-name', sheet.song_name);    
+            deleteBtn.setAttribute('data-filename', sheet.safe_filename);
+
+            deleteBtn.addEventListener('click', function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+            });
+
+
+            body.appendChild(deleteBtn)
 
             card.appendChild(body);
             link.appendChild(card);
@@ -155,6 +173,9 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     }
+
+
+
     document.getElementById('editSheetForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -182,5 +203,40 @@ document.addEventListener("DOMContentLoaded", function() {
             alert('Error: ' + error);
         });
     });
+
+    let fileToDelete = "";
+
+    // When modal opens, capture the filename from button
+    const deleteModal = document.getElementById('deleteModal');
+
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        
+        const button = event.relatedTarget;  // Button that triggered modal
+        fileToDelete = button.getAttribute('data-filename');
+        const songName = button.getAttribute('data-song-name'); // for display
+        document.getElementById('file-to-delete').textContent = songName;
+    });
+
+    // Handle delete confirmation
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        fetch('/api/delete_sheet', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ safe_filename: fileToDelete })
+        })
+        .then(res => res.json())
+        .then(data => {
+        if (data.success) {
+            alert("File deleted successfully!");
+            location.reload(); // reload page or update UI
+        } else {
+            alert("Error: " + data.message);
+        }
+        })
+        .catch(err => console.error(err));
+    });
+
 
 });

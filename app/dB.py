@@ -279,4 +279,14 @@ def db_edit_sheet(safe_filename,song_name=None, authors=None, categories=None, i
             print(sheet)
         session.commit()
 
-        
+    
+def db_delete_sheet(safe_filename):
+    with SessionLocal() as session:
+        sheet = session.query(Sheet).filter(Sheet.safe_filename == safe_filename).first()
+
+        if sheet:
+            session.delete(sheet)
+            session.commit()
+            return True
+        else:
+            return False
