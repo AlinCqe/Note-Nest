@@ -192,19 +192,18 @@ def change_photo():
         return jsonify(sucess=False, message="Something went worng, please try again later")
 
 
+
 @routes.route('/api/edit_sheet', methods=['PATCH'])
 def edit_sheet():
     try:
 
         safe_filename = request.form.get('safe_filename', '')
         song_name = request.form.get('song_name', '')
-
         authors = [author.strip() for author in request.form.get('authors', '').split(',') if author.strip()]
-
         categories = [category.strip() for category in request.form.get('categories', '').split(',') if category.strip()]
-
         instruments = [instrument.strip() for instrument in request.form.get('instruments', '').split(',') if instrument.strip()]
 
+        print(f'safe_filename={safe_filename}, song_name={song_name}, authors={authors}, categories={categories}, instruments={instruments}')
         db_edit_sheet(safe_filename=safe_filename, song_name=song_name, authors=authors, categories=categories, instruments=instruments)
         
 

@@ -40,9 +40,17 @@ document.addEventListener("DOMContentLoaded", function() {
             title.textContent = sheet.song_name;
             body.appendChild(title);
 
+            const authors = document.createElement('p');
+            authors.classList.add('card-authors');
+            authors.textContent = sheet.authors;
+            console.log(sheet.authors)
+            console.log('------------------')
+            body.appendChild(authors);
+
             const categories = document.createElement('p');
             categories.classList.add('card-categories');
             categories.textContent = sheet.categories;
+
             body.appendChild(categories);
 
             const instruments = document.createElement('p');
@@ -173,12 +181,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 
+    // -------------------
+    // Handle edit sheet
+    // -------------------
 
     document.getElementById('editSheetForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
         const formData = new FormData(this);
-
+        console.log(formData)
         fetch('/api/edit_sheet', {
             method: 'PATCH',
             body: formData
@@ -186,13 +197,13 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Sheet updated!');
-               
+                location.reload();
+                
             } else {
                 alert('Error: ' + data.message);
             }
 
-            // Close the modal
+           
             const modalEl = document.getElementById('editSheetModal');
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
@@ -202,16 +213,20 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+
+    
+    // -------------------
+    // Handle delete sheet
+    // -------------------
     let fileToDelete = "";
 
-    // When modal opens, capture the filename from button
     const deleteModal = document.getElementById('deleteModal');
 
     deleteModal.addEventListener('show.bs.modal', function (event) {
         
-        const button = event.relatedTarget;  // Button that triggered modal
+        const button = event.relatedTarget;  
         fileToDelete = button.getAttribute('data-filename');
-        const songName = button.getAttribute('data-song-name'); // for display
+        const songName = button.getAttribute('data-song-name');
         document.getElementById('file-to-delete').textContent = songName;
     });
 

@@ -256,27 +256,20 @@ def db_update_profile_picture(user_id, new_safe_filename):
             session.commit() 
     
 
-def db_edit_sheet(safe_filename,song_name=None, authors=None, categories=None, instruments=None):
+def db_edit_sheet(safe_filename,song_name, authors, categories, instruments):
     
     print(safe_filename,song_name,authors,categories,instruments)
     with SessionLocal() as session:
         
         sheet = session.query(Sheet).filter(Sheet.safe_filename == safe_filename).first()
-        print(sheet)
+
         if sheet:
-            if song_name:
-                sheet.song_name = song_name 
+            
+            sheet.song_name = song_name   
+            sheet.authors = authors 
+            sheet.categories = categories 
+            sheet.instruments = instruments 
 
-            if authors:
-                sheet.authors = authors 
-
-            if categories:
-                sheet.categories = categories 
-
-            if instruments:
-                sheet.instruments = instruments 
-        else:
-            print(sheet)
         session.commit()
 
     
