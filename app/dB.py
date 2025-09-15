@@ -290,3 +290,12 @@ def db_delete_sheet(safe_filename):
             return True
         else:
             return False
+        
+
+def get_current_profile_picture(user_id):
+    with SessionLocal() as session:
+        user = session.query(User).filter(User.id == user_id).first()
+        
+        if user:
+            return user.profile_picture_safe_filename
+        

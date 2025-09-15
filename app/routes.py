@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, login_required, logout_user
 import uuid
 import os
 
-from .dB import insert_sheet, get_song_name, get_sheets_from_dB, db_load_user, db_check_user_exists, db_create_user, db_edit_sheet, db_check_password,db_get_user, get_user_data, db_update_profile_picture,db_delete_sheet
+from .dB import insert_sheet, get_song_name, get_sheets_from_dB, db_load_user, db_check_user_exists,get_current_profile_picture, db_create_user, db_edit_sheet, db_check_password,db_get_user, get_user_data, db_update_profile_picture,db_delete_sheet
 from .__init__ import loggin_manager
 
 routes = Blueprint('routes', __name__)  
@@ -166,17 +166,30 @@ def user(user_id):
 @routes.route('/api/user/change_photo', methods=['PATCH'])
 def change_photo():
     file = request.files.get('photo')
+
     if not file:
-        return {"error": "No file uploaded"}, 400
+        return jsonify({"error": "No file uploaded"}), 400
 
     ext = os.path.splitext(file.filename)[1] 
     new_safe_filename = f"{uuid.uuid4()}{ext}"
     os.makedirs('app/static/profile_pictures',exist_ok=True)
     file.save(os.path.join('app/static/profile_pictures', new_safe_filename))
 
-    db_update_profile_picture(user_id = current_user.id, new_safe_filename = new_safe_filename)
+    current_profile_picture = get_current_profile_picture(current_user.id)
+    if not current_profile_picture:
+        return jsonify(success=False, message="Something went wrong, please try again later")
+    
 
-    return jsonify({"new_filename": file.filename}), 200
+    if os.path.exists(os.path.join(current_app.root_path, 'static', 'profile_pictures', current_profile_picture)):
+        
+        os.remove(os.path.join(current_app.root_path, 'static', 'profile_pictures', current_profile_picture))
+        
+        db_update_profile_picture(user_id = current_user.id, new_safe_filename = new_safe_filename)
+
+        return jsonify(success=True, message="Profile picture edited successfully!")
+
+    else:
+        return jsonify(sucess=False, message="Something went worng, please try again later")
 
 
 @routes.route('/api/edit_sheet', methods=['PATCH'])

@@ -160,9 +160,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(res => res.json().then(data => ({status: res.status, ok: res.ok, body: data})))
             .then(result => {
                 if (result.ok) {
-                    const photo = user_container.querySelector("img");
-                    photo.src = `/static/profile_pictures/${result.body.new_filename}?t=${Date.now()}`;
-
+                    location.reload();
                 } else {
                     alert(result.body.error || "Upload failed");
                 }
@@ -189,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => {
             if (data.success) {
                 alert('Sheet updated!');
-                // Optionally, refresh your sheets list here
+               
             } else {
                 alert('Error: ' + data.message);
             }
